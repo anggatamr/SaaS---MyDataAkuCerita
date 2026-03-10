@@ -1,0 +1,5 @@
+Date,Dish,Quantity,Price,Total,Payment Method,Outlet
+2026-02-01,Nasi Padang,3,45000,135000,Cash,Outlet A
+2026-02-01,Ayam Bakar,2,35000,70000,QRIS,Outlet A
+2026-02-02,Sate Ayam,5,25000,125000,QRIS,Outlet B
+2026-02-02,Es Jeruk,8,8000,64000,Cash,Outlet B

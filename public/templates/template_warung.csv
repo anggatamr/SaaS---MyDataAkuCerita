@@ -1,0 +1,6 @@
+Date,Product,Quantity,Unit Price,Total,Payment Method,Category
+2026-02-01,Nasi Goreng,5,25000,125000,Cash,Food
+2026-02-01,Es Teh,10,5000,50000,QRIS,Drink
+2026-02-02,Nasi Kuning,3,30000,90000,Cash,Food
+2026-02-02,Kopi Susu,12,18000,216000,QRIS,Drink
+2026-02-03,Roti Bakar,4,15000,60000,Cash,Food
