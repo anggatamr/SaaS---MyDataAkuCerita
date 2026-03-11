@@ -22,6 +22,10 @@ import {
   Sun,
   Sparkles,
   Activity,
+  Tag,
+  Package,
+  Truck,
+  MoreHorizontal,
 } from "lucide-react";
 import { motion, AnimatePresence, useScroll, useSpring, useTransform } from "framer-motion";
 import {
@@ -118,31 +122,36 @@ function NavItem({
   label,
   active = false,
   onNavigate,
+  collapsed = false,
 }: {
   icon: React.ReactNode;
   label: string;
   active?: boolean;
   onNavigate?: () => void;
+  collapsed?: boolean;
 }) {
   return (
     <motion.button
       type="button"
       onClick={onNavigate}
-      whileHover={{ x: 4, scale: 1.02 }}
+      whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
       className={`
-        w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all min-h-[40px] mb-0.5
-        ${active ? "bg-primary/15 text-primary shadow-[0_0_0_1px_rgba(14,165,160,0.4)]" : "text-muted-foreground hover:bg-muted/70 hover:text-foreground"}
-        group relative overflow-hidden
+        w-full flex items-center ${collapsed ? "justify-center" : "gap-3 px-3"} py-2.5 rounded-xl text-sm font-medium transition-all min-h-[44px] mb-1 group relative overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary z-0
+        ${active ? "text-primary" : "text-muted-foreground hover:text-foreground"}
       `}
+      title={collapsed ? label : undefined}
     >
-      <span className={`transition-colors relative z-10 ${active ? "text-primary" : "text-muted-foreground/60 group-hover:text-muted-foreground"}`}>{icon}</span>
-      <span className={`relative z-10 ${active ? "font-bold text-foreground" : "font-medium"}`}>{label}</span>
       {active && (
         <motion.div
-          layoutId="active-indicator"
-          className="ml-auto w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_var(--primary)]"
+          layoutId="flowing-nav-bg"
+          transition={{ type: "spring", stiffness: 350, damping: 30 }}
+          className="absolute inset-0 bg-primary/10 dark:bg-primary/20 rounded-xl -z-10"
         />
+      )}
+      <span className={`relative z-10 transition-colors ${active ? "text-primary shadow-sm" : "opacity-70 group-hover:opacity-100 group-hover:text-foreground"}`}>{icon}</span>
+      {!collapsed && (
+        <span className={`relative z-10 flex-1 text-left ${active ? "font-bold text-foreground" : "font-medium"}`}>{label}</span>
       )}
     </motion.button>
   );
@@ -169,21 +178,21 @@ function StatCard({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: index * 0.1 }}
-      whileHover={{ y: -5, scale: 1.01, boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)" }}
-      className="bg-card border border-border rounded-2xl p-5 flex items-center gap-4 transition-all hover:border-primary/40 group shadow-sm relative overflow-hidden"
+      transition={{ duration: 0.5, delay: index * 0.1, ease: "easeOut" }}
+      whileHover={{ y: -6, scale: 1.02 }}
+      className="apple-card p-6 flex items-center gap-5 transition-all group relative overflow-hidden chroma-grid min-h-[120px]"
     >
-      <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-transparent via-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-      <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform group-hover:bg-primary/15">
+      <div className="absolute inset-0 chroma-bg opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+      <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-3xl group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 relative z-10 shadow-inner shrink-0">
         {icon}
       </div>
-      <div>
-        <div className="text-2xl font-black text-foreground font-sans tracking-tight mb-0.5">{value}</div>
-        <div className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold opacity-70">{title}</div>
+      <div className="relative z-10">
+        <div className="text-3xl font-black text-foreground tracking-tighter mb-1 drop-shadow-sm leading-none">{value}</div>
+        <div className="text-[11px] text-muted-foreground uppercase tracking-widest font-bold opacity-80">{title}</div>
         {comparison && (
-          <div className={`text-[10px] mt-1.5 font-bold flex items-center gap-1 ${isNegative ? "text-red-500" : "text-emerald-500"}`}>
-            <TrendingUp size={10} className={isNegative ? "rotate-180" : ""} />
-            {trend} <span className="text-muted-foreground/60">({comparison})</span>
+          <div className={`text-[11px] mt-2 font-bold flex items-center gap-1.5 ${isNegative ? "text-rose-500" : "text-emerald-500"}`}>
+            <TrendingUp size={12} className={isNegative ? "rotate-180" : ""} />
+            {trend} <span className="text-muted-foreground/50">({comparison})</span>
           </div>
         )}
       </div>
@@ -306,6 +315,202 @@ function ImpactItem({
   );
 }
 
+// --- NEW VIEW COMPONENTS ---
+
+function SimulationView({ data }: { data: BusinessData }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      className="space-y-8"
+    >
+      <div className="flex flex-col gap-2">
+        <h2 className="text-3xl font-black tracking-tighter text-foreground">Simulasi Strategi Bisnis</h2>
+        <p className="text-muted-foreground font-medium">Bereksperimen dengan skenario promosi untuk mengoptimalkan profit Anda.</p>
+      </div>
+      <SimulationSection data={data} />
+
+      {/* Enhanced Simulation Details */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {[
+          { title: "Optimasi Harga", desc: "Saran penyesuaian harga berdasarkan demand pasar.", icon: <Tag className="w-5 h-5 text-primary" /> },
+          { title: "Bundling Produk", desc: "Prediksi item yang laku jika dijual paket bundling.", icon: <Package className="w-5 h-5 text-primary" /> },
+          { title: "Efisiensi Stok", desc: "Simulasi pengurangan biaya penyimpanan gudang.", icon: <Truck className="w-5 h-5 text-primary" /> }
+        ].map((item, i) => (
+          <div key={i} className="bg-card border border-border p-6 rounded-2xl group hover:border-primary/40 transition-all">
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+              {item.icon}
+            </div>
+            <h4 className="font-bold text-foreground mb-2">{item.title}</h4>
+            <p className="text-xs text-muted-foreground leading-relaxed font-medium">{item.desc}</p>
+          </div>
+        ))}
+      </div>
+    </motion.div>
+  );
+}
+
+function ChatAIView({ data }: { data: BusinessData }) {
+  const [messages, setMessages] = useState<{ role: 'user' | 'assistant', content: string }[]>([
+    { role: 'assistant', content: "Halo! Saya MyDataAkuCerita AI. Saya sudah mempelajari data bisnis Anda. Ada yang bisa saya bantu jelaskan atau analisis lebih lanjut?" }
+  ]);
+  const [input, setInput] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
+
+  const sendMessage = async () => {
+    if (!input.trim() || isTyping) return;
+    const userMsg = input;
+    setInput("");
+    setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
+    setIsTyping(true);
+
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: [...messages, { role: 'user', content: userMsg }],
+          summary: data.summary
+        })
+      });
+
+      if (!response.ok) throw new Error("Gagal mengambil respon");
+
+      const result = await response.json();
+      setMessages(prev => [...prev, { role: 'assistant', content: result.content }]);
+    } catch (error) {
+      setMessages(prev => [...prev, { role: 'assistant', content: "Maaf, terjadi kesalahan saat menghubungi asisten AI." }]);
+    } finally {
+      setIsTyping(false);
+    }
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -20 }}
+      className="h-[calc(100vh-160px)] flex flex-col bg-card border border-border rounded-3xl overflow-hidden shadow-2xl"
+    >
+      <div className="p-4 border-b border-border bg-muted/30 flex items-center gap-3">
+        <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+          <Sparkles className="text-primary w-5 h-5 animate-pulse" />
+        </div>
+        <div>
+          <h3 className="font-bold text-foreground">Chat AI Strategis</h3>
+          <p className="text-[10px] font-bold text-primary uppercase tracking-widest">Konteks: Data Penjualan Terupload</p>
+        </div>
+      </div>
+
+      <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
+        {messages.map((m, i) => (
+          <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+            <div className={`max-w-[80%] p-4 rounded-2xl text-sm font-medium leading-relaxed ${m.role === 'user'
+              ? 'bg-primary text-white shadow-lg shadow-primary/20 rounded-tr-none'
+              : 'bg-muted text-foreground border border-border rounded-tl-none'
+              }`}>
+              {m.content}
+            </div>
+          </div>
+        ))}
+        {isTyping && (
+          <div className="flex justify-start">
+            <div className="bg-muted p-4 rounded-2xl rounded-tl-none border border-border flex gap-1">
+              <span className="w-1.5 h-1.5 bg-primary/40 rounded-full animate-bounce" />
+              <span className="w-1.5 h-1.5 bg-primary/60 rounded-full animate-bounce [animation-delay:0.2s]" />
+              <span className="w-1.5 h-1.5 bg-primary/80 rounded-full animate-bounce [animation-delay:0.4s]" />
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="p-4 bg-background border-t border-border">
+        <div className="relative">
+          <input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+            placeholder="Tanyakan sesuatu tentang data Anda..."
+            className="w-full bg-muted border border-border rounded-2xl px-6 py-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all pr-16"
+          />
+          <button
+            onClick={sendMessage}
+            className="absolute right-2 top-2 bottom-2 px-4 bg-primary text-white rounded-xl font-bold shadow-lg shadow-primary/20 hover:scale-105 transition-transform"
+          >
+            Kirim
+          </button>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+function ReportsView({ data }: { data: BusinessData }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.98 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.98 }}
+      className="space-y-8"
+    >
+      <div className="bg-card border border-border p-8 rounded-[2rem] shadow-xl relative overflow-hidden print:p-0 print:border-0 print:shadow-none">
+        <div className="absolute top-0 right-0 p-12 opacity-[0.03] rotate-12 pointer-events-none">
+          <FileText size={200} />
+        </div>
+
+        <div className="flex justify-between items-start border-b border-border pb-8 mb-8">
+          <div>
+            <h2 className="text-3xl font-black tracking-tighter text-foreground mb-2">Laporan Analisis Bisnis</h2>
+            <p className="text-muted-foreground font-medium">Periode: {data.charts[0]?.date} - {data.charts[data.charts.length - 1]?.date}</p>
+          </div>
+          <div className="text-right">
+            <div className="text-xs font-black text-primary uppercase tracking-[0.2em] mb-1">Status Laporan</div>
+            <div className="px-3 py-1 bg-emerald-500/10 text-emerald-500 rounded-full text-[10px] font-black border border-emerald-500/20 inline-block">FINALIZED</div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+          <div className="space-y-6">
+            <h4 className="text-xs font-black uppercase tracking-widest text-primary border-b border-primary/10 pb-2">Ringkasan Eksekutif</h4>
+            <div className="space-y-4">
+              <p className="text-sm text-foreground leading-relaxed font-medium">
+                Berdasarkan data yang dianalisis, bisnis menunjukkan pertumbuhan revenue sebesar <span className="text-primary font-black">12.5%</span> dibandingkan periode sebelumnya. Efisiensi transaksi berada pada level optimis dengan rata-rata order senilai <span className="font-bold">Rp {data.summary.avgOrderValue.toLocaleString("id-ID")}</span>.
+              </p>
+              <div className="p-4 bg-muted/50 rounded-xl border border-border space-y-3">
+                <div className="flex justify-between text-xs">
+                  <span className="text-muted-foreground font-medium">Total Skor Kesehatan</span>
+                  <span className="text-foreground font-black">8.4 / 10</span>
+                </div>
+                <div className="w-full h-1.5 bg-border rounded-full overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-primary to-emerald-500 w-[84%]" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            <h4 className="text-xs font-black uppercase tracking-widest text-primary border-b border-primary/10 pb-2">Insight Strategis Utama</h4>
+            <div className="space-y-3">
+              {data.insights.slice(0, 3).map((insight, i) => (
+                <div key={i} className="flex gap-4 items-start">
+                  <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-black text-primary">
+                    {i + 1}
+                  </div>
+                  <div>
+                    <div className="text-sm font-bold text-foreground mb-0.5">{insight.title}</div>
+                    <p className="text-[11px] text-muted-foreground leading-relaxed">{insight.content}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 function ForecastingChart({ data }: { data: BusinessData["forecast"] }) {
   if (!data) return null;
 
@@ -404,12 +609,15 @@ export default function Dashboard() {
   const [selectedBusinessType, setSelectedBusinessType] = useState<string>("");
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [showMapping, setShowMapping] = useState(false);
+  const [showTour, setShowTour] = useState(false);
+  const [tourStep, setTourStep] = useState(0);
   const [pendingRows, setPendingRows] = useState<any[] | null>(null);
   const [mappingDateColumn, setMappingDateColumn] = useState<string>("");
   const [mappingRevenueColumn, setMappingRevenueColumn] = useState<string>("");
   const [mappingCandidates, setMappingCandidates] = useState<{ date: string[]; revenue: string[] }>({ date: [], revenue: [] });
   const [period, setPeriod] = useState<"day" | "week" | "month">("week");
   const [activeNav, setActiveNav] = useState(0);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [selectedInsight, setSelectedInsight] = useState<BusinessData["insights"][0] | null>(null);
   const [glowPos, setGlowPos] = useState({ x: 50, y: 50 });
   const uploadRef = useRef<HTMLDivElement>(null);
@@ -501,21 +709,22 @@ export default function Dashboard() {
         if (file.name === "demo.csv" || file.size === 0) {
           // Load real demo data instead of empty file
           const demoData = [
-            ["Date", "Product", "Quantity", "Unit Price", "Total"],
-            ["2026-02-01", "Nasi Goreng", "5", "25000", "125000"],
-            ["2026-02-01", "Es Teh", "10", "5000", "50000"],
-            ["2026-02-02", "Nasi Kuning", "3", "30000", "90000"],
-            ["2026-02-02", "Kopi Susu", "12", "18000", "216000"],
-            ["2026-02-03", "Roti Bakar", "4", "15000", "60000"],
-            ["2026-02-04", "Nasi Goreng", "7", "25000", "175000"],
-            ["2026-02-05", "Es Teh", "15", "5000", "75000"],
-            ["2026-02-06", "Kopi Susu", "10", "18000", "180000"],
-            ["2026-02-07", "Nasi Kuning", "5", "30000", "150000"],
+            ["Tanggal", "Produk Laku", "Terjual", "Harga Satuan", "Total Penjualan"],
+            ["2026-02-01", "Ayam Bakar", "25", "25000", "625000"],
+            ["2026-02-01", "Es Jeruk/Teh", "50", "5000", "250000"],
+            ["2026-02-01", "Nasi Putih", "40", "5000", "200000"],
+            ["2026-02-02", "Bebek Goreng Pak Joss", "30", "35000", "1050000"],
+            ["2026-02-02", "Tumis Kangkung", "15", "15000", "225000"],
+            ["2026-02-03", "Ayam Bakar", "40", "25000", "1000000"],
+            ["2026-02-04", "Bebek Goreng Pak Joss", "20", "35000", "700000"],
+            ["2026-02-05", "Es Jeruk/Teh", "60", "5000", "300000"],
+            ["2026-02-06", "Tumis Kangkung", "25", "15000", "375000"],
+            ["2026-02-07", "Nasi Putih", "60", "5000", "300000"],
           ];
           // Padding to simulate more days
           for (let i = 8; i <= 30; i++) {
             const date = `2026-02-${i.toString().padStart(2, '0')}`;
-            demoData.push([date, "Produk Variansi", Math.floor(Math.random() * 10 + 1).toString(), "15000", (Math.floor(Math.random() * 10 + 1) * 15000).toString()]);
+            demoData.push([date, "Mendoan Panas", Math.floor(Math.random() * 20 + 5).toString(), "10000", (Math.floor(Math.random() * 20 + 5) * 10000).toString()]);
           }
           const headers = demoData[0];
           parsed = demoData.slice(1).map((r) => {
@@ -595,6 +804,11 @@ export default function Dashboard() {
 
       setData(analysis);
       showToast("Dashboard siap! Insight berhasil dibuat.", "success");
+      
+      const hasSeenTour = localStorage.getItem("datanarasi_tour_seen");
+      if (!hasSeenTour) {
+        setTimeout(() => setShowTour(true), 1500); // Tunda sedikit agar user familiar dulu
+      }
     } catch (err) {
       const message = err instanceof Error ? err.message : "Gagal menganalisis data.";
       setError(message);
@@ -635,7 +849,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex h-screen bg-background text-foreground overflow-hidden font-sans selection:bg-primary/20">
+    <div className="flex h-[100dvh] bg-background text-foreground overflow-hidden font-sans selection:bg-primary/20">
       <GridBackground />
 
       {/* Scroll Progress Bar */}
@@ -646,35 +860,66 @@ export default function Dashboard() {
         />
       )}
 
-      {/* Sidebar */}
+      {/* Mobile Sidebar Overlay */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-[45] md:hidden backdrop-blur-sm"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar - Interactive Nav Card style */}
       <aside
         className={`
-          fixed md:relative inset-y-0 left-0 w-[220px] bg-card border-r border-border flex flex-col z-40
-          transform transition-transform duration-300 ease-[cubic-bezier(0.2,0.8,0.2,1)]
+          fixed md:sticky md:top-4 md:ml-4 md:rounded-3xl inset-y-0 left-0 
+          ${sidebarCollapsed ? "w-[80px]" : "w-[280px] md:w-[260px]"} 
+          h-[100dvh] md:h-[calc(100vh-2rem)] nav-card border-r md:border-r-0 md:border md:border-border flex-col z-50
+          transform transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]
           ${sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
+          bg-background/95 md:bg-transparent
         `}
       >
-        {/* Logo */}
-        <div className="p-5 border-b border-border flex items-center justify-between">
-          <BrandLogo />
-          <button onClick={() => setSidebarOpen(false)} className="md:hidden text-muted-foreground hover:text-foreground">
-            <X size={18} />
+        {/* Logo & Toggle */}
+        <div className={`p-5 flex items-center ${sidebarCollapsed ? "justify-center" : "justify-between"}`}>
+          {!sidebarCollapsed && <BrandLogo className="scale-90 origin-left" />}
+          {sidebarCollapsed && (
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#0EA5A0] to-[#065A82] flex items-center justify-center shrink-0">
+               <Activity className="text-white w-5 h-5 mx-auto" />
+            </div>
+          )}
+          <button 
+            type="button"
+            onClick={() => {
+              if (window.innerWidth < 768) {
+                setSidebarOpen(false);
+              } else {
+                setSidebarCollapsed(!sidebarCollapsed);
+              }
+            }} 
+            className={`text-muted-foreground hover:text-foreground p-1.5 rounded-xl hover:bg-muted/50 hidden md:flex items-center justify-center shrink-0 ${sidebarCollapsed ? 'mt-4' : ''}`}
+            title="Toggle Sidebar"
+          >
+            <MoreHorizontal size={20} className={sidebarCollapsed ? "transition-transform text-primary" : "transition-transform"} />
+          </button>
+          <button type="button" onClick={() => setSidebarOpen(false)} className="md:hidden text-muted-foreground hover:text-foreground p-1.5 shrink-0">
+            <X size={20} />
           </button>
         </div>
 
-        <nav className="flex-1 p-3 space-y-4">
-          <div>
-            <div className="text-[9px] font-bold text-muted-foreground uppercase tracking-[0.2em] px-2 mb-2">Menu</div>
-            <div className="space-y-0.5">
+        <nav className="flex-1 p-3 flex flex-col gap-6 overflow-y-auto custom-scrollbar mt-2">
+          <div className="relative">
+            {!sidebarCollapsed && <div className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-3 mb-3">Menu Utama</div>}
+            <div className={`space-y-1 ${sidebarCollapsed ? "flex flex-col items-center gap-1" : ""}`}>
               {NAV_ITEMS.map((item, i) => (
                 <NavItem
                   key={item.label}
-                  icon={<item.icon size={16} />}
+                  icon={<item.icon size={20} />}
                   label={item.label}
                   active={activeNav === i}
+                  collapsed={sidebarCollapsed}
                   onNavigate={() => {
                     setActiveNav(i);
-                    setSidebarOpen(false);
+                    if (window.innerWidth < 768) setSidebarOpen(false);
                   }}
                 />
               ))}
@@ -683,32 +928,38 @@ export default function Dashboard() {
         </nav>
 
         {/* User Badge */}
-        <div className="p-3 border-t border-border">
-          <div className="flex items-center gap-3 p-2 rounded-lg bg-muted/50">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-amber-500 flex items-center justify-center text-xs font-bold text-white shadow-lg">A</div>
-            <div className="min-w-0">
-              <div className="text-xs font-bold text-foreground truncate">Angga</div>
-              <div className="text-[9px] text-primary font-bold">Pro Plan</div>
-            </div>
-            <Settings size={14} className="ml-auto text-muted-foreground cursor-pointer hover:text-foreground" />
+        <div className="p-4 mt-auto">
+          <div className={`flex items-center ${sidebarCollapsed ? "justify-center" : "gap-3"} p-2.5 rounded-2xl bg-white/40 dark:bg-black/20 border border-white/40 dark:border-white/5 shadow-sm backdrop-blur-md transition-all`}>
+            <div className="w-10 h-10 rounded-[0.8rem] bg-gradient-to-br from-primary to-[#065A82] flex items-center justify-center text-sm font-black text-white shadow-lg shrink-0 border border-white/20">A</div>
+            {!sidebarCollapsed && (
+              <>
+                <div className="min-w-0 flex-1">
+                  <div className="text-sm font-bold text-foreground truncate drop-shadow-sm">Angga</div>
+                  <div className="text-[10px] text-primary font-black uppercase tracking-wider">Premium</div>
+                </div>
+                <Settings size={18} className="text-muted-foreground/60 hover:text-primary transition-colors cursor-pointer shrink-0" />
+              </>
+            )}
           </div>
         </div>
       </aside>
 
       {/* Main */}
-      <main className="flex-1 flex flex-col relative z-10 overflow-hidden">
+      <main className="flex-1 flex flex-col relative z-10 overflow-hidden w-full max-w-[100vw]">
         <header className={`sticky top-0 z-40 flex h-16 items-center justify-between gap-4 border-b px-4 md:px-8 transition-all duration-300 ${scrolled ? "bg-background/80 backdrop-blur-xl border-border shadow-sm" : "bg-transparent border-transparent"}`}>
           <div className="flex items-center gap-4">
             <button
+              type="button"
               onClick={() => setSidebarOpen(true)}
-              className="md:hidden p-1.5 text-muted-foreground hover:text-foreground transition-colors"
+              className="p-1 -ml-1 text-muted-foreground hover:text-foreground md:hidden rounded-lg hover:bg-muted/50 transition-colors"
+              aria-label="Buka Menu"
             >
-              <Menu size={20} />
+               <Menu size={22} />
             </button>
             <div className="flex items-center gap-2 text-[11px] font-medium tracking-wide">
               <BrandLogo showText={false} className="scale-75 origin-left" />
-              <ChevronRight size={12} className="text-muted-foreground/30" />
-              <span className="text-foreground">Dashboard</span>
+              <ChevronRight size={12} className="text-muted-foreground/30 hidden sm:block" />
+              <span className="text-foreground font-bold hidden sm:block">Dashboard</span>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -807,20 +1058,25 @@ export default function Dashboard() {
                 className="max-w-3xl mx-auto mt-6 md:mt-12"
               >
                 <div className="text-center mb-8 md:mb-10">
-                  <h2 className="text-2xl sm:text-3xl md:text-4xl font-black mb-2 md:mb-3 tracking-tighter text-foreground underline decoration-primary/20 underline-offset-4 md:underline-offset-8">
-                    Level Up Bisnis Anda
+                  <h2 className="text-2xl sm:text-3xl md:text-4xl font-black mb-3 md:mb-4 tracking-tighter text-foreground">
+                    Cek <span className="underline decoration-primary/40 underline-offset-4">Untung Rugi</span> Bisnis Anda
                   </h2>
-                  <p className="text-muted-foreground text-base md:text-lg font-medium px-2">
-                    Upload dataset Anda, biarkan AI kami mengubahnya menjadi strategi emas.
+                  <p className="text-muted-foreground text-base md:text-lg font-medium px-2 max-w-2xl mx-auto leading-relaxed">
+                    Upload excel penjualan kasir Anda, biar AI cari tahu makanan/barang apa yang bikin untung dan mana yang macet tanpa perlu hitung manual.
                   </p>
+                  <div className="mt-4 inline-flex items-center gap-2 bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400 px-4 py-1.5 rounded-full text-xs font-bold ring-1 ring-emerald-200 dark:ring-emerald-800">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    Data 100% Rahasia & Aman. Kami tidak menjual data Anda.
+                  </div>
                 </div>
 
                 <div
                   className={`
-                    apple-card p-8 sm:p-12 md:p-16 border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-all duration-300 relative overflow-hidden group
-                    ${isDragging ? "border-primary bg-primary/[0.02] scale-[1.02] shadow-2xl shadow-primary/5" : "border-slate-200"}
+                    apple-card p-8 sm:p-12 md:p-16 border-2 flex flex-col items-center justify-center cursor-pointer transition-all duration-500 relative overflow-hidden group chroma-grid
+                    ${isDragging ? "border-primary bg-primary/[0.02] scale-[1.02] shadow-[0_20px_60px_-15px_rgba(14,165,160,0.2)]" : "border-slate-200 border-dashed dark:border-slate-800 hover:border-primary/50"}
                   `}
                   onDragOver={(e) => {
+
                     e.preventDefault();
                     setIsDragging(true);
                   }}
@@ -845,7 +1101,7 @@ export default function Dashboard() {
                   {isProcessing ? (
                     <div className="flex flex-col items-center gap-4">
                       <Loader2 className="w-12 h-12 text-primary animate-spin" aria-hidden />
-                      <p className="text-lg md:text-xl font-bold text-slate-900 animate-pulse">
+                      <p className="text-lg md:text-xl font-bold text-slate-900 dark:text-white animate-pulse">
                         Menghitung Insight Bisnis...
                       </p>
                       <div className="w-full max-w-xs">
@@ -853,7 +1109,7 @@ export default function Dashboard() {
                           <div className="progress-fill" style={{ width: `${uploadProgress}%` }} />
                         </div>
                       </div>
-                      <p className="text-sm text-slate-500">Data Anda diproses secara privat</p>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">Data Anda diproses secara privat</p>
                     </div>
                   ) : (
                     <>
@@ -870,14 +1126,14 @@ export default function Dashboard() {
                         className="w-full max-w-md mx-auto mb-5"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        <label className="block text-[11px] font-black uppercase tracking-widest text-slate-500 mb-2">
+                        <label className="block text-[11px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-2">
                           Pilih tipe UMKM
                         </label>
                         <div className="flex gap-2">
                           <select
                             value={selectedBusinessType}
                             onChange={(e) => setSelectedBusinessType(e.target.value)}
-                            className="flex-1 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary"
+                            className="flex-1 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 py-3 text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
                           >
                             <option value="">Pilih (opsional)</option>
                             <option value="warung">Warung</option>
@@ -888,7 +1144,7 @@ export default function Dashboard() {
                           <button
                             type="button"
                             onClick={() => downloadTemplate(selectedBusinessType || "warung")}
-                            className="px-4 py-3 rounded-2xl border border-slate-200 bg-white text-slate-700 font-bold hover:bg-slate-50 transition-colors min-h-[44px] flex items-center gap-2"
+                            className="px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors min-h-[44px] flex items-center gap-2"
                             title="Download template sesuai tipe UMKM"
                           >
                             <Download size={16} />
@@ -923,172 +1179,178 @@ export default function Dashboard() {
               </motion.div>
             ) : (
               <motion.div
-                key="dashboard"
+                key="content-container"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.2 }}
-                className="space-y-6 md:space-y-8 pb-8 md:pb-12"
+                className="pb-8 md:pb-12"
               >
-                {/* Stats */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-100px" }}
-                  transition={{ duration: 0.5 }}
-                  className="grid stat-cards gap-3 md:gap-6"
-                >
-                  {isProcessing ? (
-                    // Skeleton loaders
-                    Array.from({ length: 4 }).map((_, i) => (
-                      <div key={i} className="apple-card p-4 md:p-6 bg-card border-none shadow-sm">
-                        <div className="skeleton h-4 w-20 mb-2 rounded" />
-                        <div className="skeleton h-8 w-24 mb-1 rounded" />
-                        <div className="skeleton h-3 w-12 rounded" />
-                      </div>
-                    ))
-                  ) : (
-                    <>
-                      <StatCard
-                        index={0}
-                        title="Total Revenue"
-                        value={`Rp ${data.summary.totalRevenue.toLocaleString("id-ID")}`}
-                        trend="+12.5%"
-                        comparison="+Rp 1.2M"
-                        icon="💰"
-                      />
-                      <StatCard
-                        index={1}
-                        title="Total Transaksi"
-                        value={data.summary.totalTransactions.toLocaleString("id-ID")}
-                        trend="+4.2%"
-                        comparison="+12"
-                        icon="📈"
-                      />
-                      <StatCard
-                        index={2}
-                        title="Avg Order Value"
-                        value={`Rp ${data.summary.avgOrderValue.toLocaleString("id-ID")}`}
-                        trend="-1.8%"
-                        isNegative
-                        comparison="-Rp 5rb"
-                        icon="📦"
-                      />
-                      <StatCard
-                        index={3}
-                        title="Pelanggan Baru"
-                        value={data.summary.newCustomers.toLocaleString("id-ID")}
-                        trend="+8.1%"
-                        comparison="+4"
-                        icon="🎯"
-                      />
-                    </>
-                  )}
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-100px" }}
-                  transition={{ duration: 0.6 }}
-                  className="grid grid-cols-1 lg:grid-cols-3 gap-8"
-                >
-                  {/* AI Insights */}
-                  <div className="lg:col-span-1 space-y-6 order-2 lg:order-1">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">
-                        AI Strategi <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                      </h3>
-                    </div>
-                    <div className="space-y-4">
-                      {data.insights.map((insight, idx) => (
-                        <InsightCard key={idx} {...insight} index={idx} onClick={() => setSelectedInsight(insight)} />
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Chart */}
-                  <div className="lg:col-span-2 space-y-6 order-1 lg:order-2">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-xl font-bold text-foreground tracking-tight">Trend Penjualan</h3>
-                      <div className="flex gap-1.5 bg-muted/30 p-1 rounded-lg border border-border">
-                        {(["day", "week", "month"] as const).map((p) => (
-                          <button
-                            key={p}
-                            onClick={() => setPeriod(p)}
-                            className={`px-3 py-1 text-[10px] font-bold rounded-md transition-all ${period === p
-                              ? "bg-primary text-white shadow-lg shadow-primary/20"
-                              : "text-muted-foreground hover:text-foreground"
-                              }`}
-                          >
-                            {p === "day" ? "Harian" : p === "week" ? "Mingguan" : "Bulanan"}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="bg-card border border-border p-6 rounded-2xl flex flex-col h-[400px]">
-                      <div className="flex-1 w-full">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <BarChart
-                            data={filterDataByPeriod(data.charts, period)}
-                            margin={{ top: 0, right: 0, left: -20, bottom: 0 }}
-                          >
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148,163,184,0.25)" />
-                            <XAxis
-                              dataKey="date"
-                              axisLine={false}
-                              tickLine={false}
-                              tick={{ fill: "rgba(100,116,139,0.9)", fontSize: 10, fontWeight: 700 }}
-                              dy={10}
+                <AnimatePresence mode="wait">
+                  {activeNav === 0 && (
+                    <motion.div
+                      key="dashboard-view"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="space-y-6 md:space-y-8"
+                    >
+                      {/* Stats */}
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: "-100px" }}
+                        transition={{ duration: 0.5 }}
+                        className="grid stat-cards gap-3 md:gap-6"
+                      >
+                        {isProcessing ? (
+                          // Skeleton loaders
+                          Array.from({ length: 4 }).map((_, i) => (
+                            <div key={i} className="apple-card p-4 md:p-6 bg-card border-none shadow-sm">
+                              <div className="skeleton h-4 w-20 mb-2 rounded" />
+                              <div className="skeleton h-8 w-24 mb-1 rounded" />
+                              <div className="skeleton h-3 w-12 rounded" />
+                            </div>
+                          ))
+                        ) : (
+                          <>
+                            <StatCard
+                              index={0}
+                              title="Total Revenue"
+                              value={`Rp ${data.summary.totalRevenue.toLocaleString("id-ID")}`}
+                              trend="+12.5%"
+                              comparison="+Rp 1.2M"
+                              icon="💰"
                             />
-                            <YAxis
-                              axisLine={false}
-                              tickLine={false}
-                              tick={{ fill: "rgba(100,116,139,0.9)", fontSize: 10, fontWeight: 700 }}
-                              tickFormatter={(val) => (val >= 1000000 ? `${val / 1000000}jt` : `${val / 1000}rb`)}
-                              width={50}
+                            <StatCard
+                              index={1}
+                              title="Total Transaksi"
+                              value={data.summary.totalTransactions.toLocaleString("id-ID")}
+                              trend="+4.2%"
+                              comparison="+12"
+                              icon="📈"
                             />
-                            <Tooltip
-                              cursor={{ fill: "rgba(14,165,160,0.05)" }}
-                              contentStyle={{
-                                background: "var(--card)",
-                                border: "1px solid var(--border)",
-                                borderRadius: "12px",
-                                boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
-                                fontSize: "11px",
-                                fontWeight: "600",
-                                color: "var(--foreground)"
-                              }}
-                              itemStyle={{ color: "#0EA5A0" }}
+                            <StatCard
+                              index={2}
+                              title="Avg Order Value"
+                              value={`Rp ${data.summary.avgOrderValue.toLocaleString("id-ID")}`}
+                              trend="-1.8%"
+                              isNegative
+                              comparison="-Rp 5rb"
+                              icon="📦"
                             />
-                            <Bar
-                              dataKey="revenue"
-                              radius={[4, 4, 0, 0]}
-                              className="fill-primary/80 hover:fill-primary transition-colors"
-                            >
-                              {filterDataByPeriod(data.charts, period).map((entry, index) => (
-                                <Cell key={`cell-${index}`} fillOpacity={0.8} />
+                            <StatCard
+                              index={3}
+                              title="Pelanggan Baru"
+                              value={data.summary.newCustomers.toLocaleString("id-ID")}
+                              trend="+8.1%"
+                              comparison="+4"
+                              icon="🎯"
+                            />
+                          </>
+                        )}
+                      </motion.div>
+
+                      <motion.div
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: "-100px" }}
+                        transition={{ duration: 0.6 }}
+                        className="grid grid-cols-1 lg:grid-cols-3 gap-8"
+                      >
+                        {/* AI Insights */}
+                        <div className="lg:col-span-1 space-y-6 order-2 lg:order-1">
+                          <div className="flex items-center justify-between">
+                            <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">
+                              AI Strategi <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                            </h3>
+                          </div>
+                          <div className="space-y-4">
+                            {data.insights.map((insight, idx) => (
+                              <InsightCard key={idx} {...insight} index={idx} onClick={() => setSelectedInsight(insight)} />
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Chart */}
+                        <div className="lg:col-span-2 space-y-6 order-1 lg:order-2">
+                          <div className="flex items-center justify-between">
+                            <h3 className="text-xl font-bold text-foreground tracking-tight">Trend Penjualan</h3>
+                            <div className="flex gap-1.5 bg-muted/30 p-1 rounded-lg border border-border">
+                              {(["day", "week", "month"] as const).map((p) => (
+                                <button
+                                  key={p}
+                                  onClick={() => setPeriod(p)}
+                                  className={`px-3 py-1 text-[10px] font-bold rounded-md transition-all ${period === p
+                                    ? "bg-primary text-white shadow-lg shadow-primary/20"
+                                    : "text-muted-foreground hover:text-foreground"
+                                    }`}
+                                >
+                                  {p === "day" ? "Harian" : p === "week" ? "Mingguan" : "Bulanan"}
+                                </button>
                               ))}
-                            </Bar>
-                          </BarChart>
-                        </ResponsiveContainer>
-                      </div>
-                    </div>
+                            </div>
+                          </div>
 
-                    {/* Forecasting Chart */}
-                    <ForecastingChart data={data.forecast} />
-                  </div>
-                </motion.div>
+                          <div className="bg-card border border-border p-6 rounded-2xl flex flex-col h-[400px]">
+                            <div className="flex-1 w-full">
+                              <ResponsiveContainer width="100%" height="100%">
+                                <BarChart
+                                  data={filterDataByPeriod(data.charts, period)}
+                                  margin={{ top: 0, right: 0, left: -20, bottom: 0 }}
+                                >
+                                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148,163,184,0.25)" />
+                                  <XAxis
+                                    dataKey="date"
+                                    axisLine={false}
+                                    tickLine={false}
+                                    tick={{ fill: "rgba(100,116,139,0.9)", fontSize: 10, fontWeight: 700 }}
+                                    dy={10}
+                                  />
+                                  <YAxis
+                                    axisLine={false}
+                                    tickLine={false}
+                                    tick={{ fill: "rgba(100,116,139,0.9)", fontSize: 10, fontWeight: 700 }}
+                                    tickFormatter={(val) => (val >= 1000000 ? `${val / 1000000}jt` : `${val / 1000}rb`)}
+                                    width={50}
+                                  />
+                                  <Tooltip
+                                    cursor={{ fill: "rgba(14,165,160,0.05)" }}
+                                    contentStyle={{
+                                      background: "var(--card)",
+                                      border: "1px solid var(--border)",
+                                      borderRadius: "12px",
+                                      boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
+                                      fontSize: "11px",
+                                      fontWeight: "600",
+                                      color: "var(--foreground)"
+                                    }}
+                                    itemStyle={{ color: "#0EA5A0" }}
+                                  />
+                                  <Bar
+                                    dataKey="revenue"
+                                    radius={[4, 4, 0, 0]}
+                                    className="fill-primary/80 hover:fill-primary transition-colors"
+                                  >
+                                    {filterDataByPeriod(data.charts, period).map((entry, index) => (
+                                      <Cell key={`cell-${index}`} fillOpacity={0.8} />
+                                    ))}
+                                  </Bar>
+                                </BarChart>
+                              </ResponsiveContainer>
+                            </div>
+                          </div>
 
-                {/* Simulation */}
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-100px" }}
-                  transition={{ duration: 0.6 }}
-                >
-                  <SimulationSection data={data} />
-                </motion.div>
+                          {/* Forecasting Chart */}
+                          <ForecastingChart data={data.forecast} />
+                        </div>
+                      </motion.div>
+                    </motion.div>
+                  )}
+
+                  {activeNav === 1 && <ChatAIView key="chat-view" data={data} />}
+                  {activeNav === 2 && <SimulationView key="simulation-view" data={data} />}
+                  {activeNav === 3 && <ReportsView key="reports-view" data={data} />}
+                </AnimatePresence>
               </motion.div>
             )}
           </AnimatePresence>
@@ -1352,16 +1614,97 @@ export default function Dashboard() {
                 {selectedInsight.content}
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
-                <button className="flex-1 px-6 py-4 bg-primary text-white rounded-2xl font-bold hover:bg-primary/90 transition-all shadow-xl shadow-primary/20 active:scale-[0.98]">
-                  Laksanakan Rekomendasi
+                <button
+                  onClick={() => {
+                    const text = encodeURIComponent(`Halo, ini rekomendasi strategi dari MyDataAkuCerita:\n\n*${selectedInsight.title}*\n${selectedInsight.content}\n\nAyo segera kita eksekusi!`);
+                    window.open(`https://wa.me/?text=${text}`, '_blank');
+                  }}
+                  className="flex-1 px-6 py-4 bg-[#25D366] text-white rounded-2xl font-bold hover:bg-[#128C7E] transition-all shadow-xl shadow-[#25D366]/20 active:scale-[0.98] flex items-center justify-center gap-2"
+                >
+                  <MessageSquare size={18} />
+                  Kirim ke Tim (WhatsApp)
                 </button>
                 <button
-                  onClick={() => setSelectedInsight(null)}
-                  className="px-6 py-4 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-2xl font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-[0.98]"
+                  onClick={() => {
+                    navigator.clipboard.writeText(`${selectedInsight.title}\n${selectedInsight.content}`);
+                    setToast({ message: "Teks insight disalin!", type: "success" });
+                  }}
+                  className="flex-1 px-6 py-4 bg-primary text-white rounded-2xl font-bold hover:bg-primary/90 transition-all shadow-xl shadow-primary/20 active:scale-[0.98] flex items-center justify-center gap-2"
                 >
-                  Nanti Saja
+                  <FileText size={18} />
+                  Salin Teks
                 </button>
               </div>
+              <div className="mt-3 text-center">
+                <button onClick={() => setSelectedInsight(null)} className="text-sm font-bold text-slate-500 hover:text-slate-800 transition-colors">Tutup</button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Guided Tour Modal */}
+      <AnimatePresence>
+        {showTour && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="bg-card w-full max-w-sm rounded-3xl shadow-2xl overflow-hidden relative border border-border p-8 text-center"
+            >
+              <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                {tourStep === 0 && <LayoutDashboard className="text-primary w-8 h-8" />}
+                {tourStep === 1 && <BarChart3 className="text-primary w-8 h-8" />}
+                {tourStep === 2 && <MessageSquare className="text-primary w-8 h-8" />}
+              </div>
+              
+              <h3 className="text-2xl font-black mb-3">
+                {tourStep === 0 ? "Selamat Datang!" : tourStep === 1 ? "Cek Insight AI" : "Tanya Asisten AI"}
+              </h3>
+              
+              <p className="text-muted-foreground font-medium mb-8 leading-relaxed">
+                {tourStep === 0 
+                  ? "Dashboard ini menampilkan rangkuman penjualan Anda. Cek total pemasukan dan status pelanggan di deretan kartu atas." 
+                  : tourStep === 1 
+                  ? "Sistem AI kami telah membaca pola data Anda dan memberikan rekomendasi strategi spesifik di bagian AI Strategi." 
+                  : "Punya pertanyaan soal data jualan? Tanyakan langsung ke Chat AI menggunakan bahasa sehari-hari."}
+              </p>
+              
+              <div className="flex items-center justify-between">
+                <div className="flex gap-1.5">
+                  {[0, 1, 2].map((i) => (
+                    <div key={i} className={`w-2 h-2 rounded-full ${tourStep === i ? "bg-primary w-4" : "bg-primary/20"} transition-all`} />
+                  ))}
+                </div>
+                <button
+                  onClick={() => {
+                    if (tourStep < 2) {
+                      setTourStep(tourStep + 1);
+                    } else {
+                      localStorage.setItem("datanarasi_tour_seen", "true");
+                      setShowTour(false);
+                    }
+                  }}
+                  className="px-6 py-2.5 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 active:scale-95 transition-all shadow-lg shadow-primary/20"
+                >
+                  {tourStep < 2 ? "Lanjut" : "Mulai Gunakan"}
+                </button>
+              </div>
+              <button 
+                onClick={() => {
+                  localStorage.setItem("datanarasi_tour_seen", "true");
+                  setShowTour(false);
+                }} 
+                className="absolute top-4 right-4 p-2 text-muted-foreground hover:text-foreground"
+              >
+                <X size={16} />
+              </button>
             </motion.div>
           </motion.div>
         )}
