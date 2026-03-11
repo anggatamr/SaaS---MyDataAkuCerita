@@ -1018,7 +1018,7 @@ export default function Dashboard() {
 
         <div
           ref={scrollContainerRef}
-          className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 space-y-6 md:space-y-8 bg-background/50 safe-bottom relative custom-scrollbar"
+          className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 pb-24 md:pb-8 space-y-6 md:space-y-8 bg-background/50 safe-bottom relative custom-scrollbar"
         >
           {/* Subtle Green Hint Flare */}
           <div className="absolute inset-x-0 top-0 h-64 green-hint opacity-100 transition-opacity duration-1000" aria-hidden="true" />
@@ -1101,7 +1101,7 @@ export default function Dashboard() {
                   {isProcessing ? (
                     <div className="flex flex-col items-center gap-4">
                       <Loader2 className="w-12 h-12 text-primary animate-spin" aria-hidden />
-                      <p className="text-lg md:text-xl font-bold text-slate-900 dark:text-white animate-pulse">
+                      <p className="text-lg md:text-xl font-bold text-foreground animate-pulse">
                         Menghitung Insight Bisnis...
                       </p>
                       <div className="w-full max-w-xs">
@@ -1109,7 +1109,7 @@ export default function Dashboard() {
                           <div className="progress-fill" style={{ width: `${uploadProgress}%` }} />
                         </div>
                       </div>
-                      <p className="text-sm text-slate-500 dark:text-slate-400">Data Anda diproses secara privat</p>
+                      <p className="text-sm text-muted-foreground">Data Anda diproses secara privat</p>
                     </div>
                   ) : (
                     <>
@@ -1606,11 +1606,11 @@ export default function Dashboard() {
                 >
                   {selectedInsight.type}
                 </span>
-                <h2 className="text-2xl md:text-3xl font-black mt-4 text-slate-900 dark:text-white tracking-tighter">
+                <h2 className="text-2xl md:text-3xl font-black mt-4 text-foreground tracking-tighter">
                   {selectedInsight.title}
                 </h2>
               </div>
-              <p className="text-slate-600 dark:text-slate-400 mb-8 leading-relaxed font-medium">
+              <p className="text-muted-foreground mb-8 leading-relaxed font-medium">
                 {selectedInsight.content}
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
