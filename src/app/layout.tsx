@@ -16,12 +16,12 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "DataNarasi — AI Business Analyst untuk UMKM Indonesia",
+  title: "MyDataAkuCerita — AI Business Analyst untuk UMKM Indonesia",
   description:
     "Ubah spreadsheet menjadi strategi bisnis dalam 30 detik. AI Business Analyst untuk UMKM Indonesia — insight otomatis, rekomendasi strategis, dan simulasi prediktif dalam Bahasa Indonesia.",
   keywords: ["UMKM", "analisis bisnis", "AI", "data", "Indonesia", "business analyst"],
   openGraph: {
-    title: "DataNarasi — AI Business Analyst untuk UMKM",
+    title: "MyDataAkuCerita — AI Business Analyst untuk UMKM",
     description: "Transforming raw spreadsheets into strategic business narratives in 30 seconds.",
   },
 };

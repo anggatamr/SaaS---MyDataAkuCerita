@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
             messages: [
               {
                 role: "user",
-                content: `Anda adalah DataNarasi AI, Business Analyst untuk UMKM Indonesia. Analisis ringkasan data berikut dan berikan insight dalam Bahasa Indonesia. Format respons HARUS valid JSON saja, tanpa markdown.
+                content: `Anda adalah MyDataAkuCerita AI, Business Analyst untuk UMKM Indonesia. Analisis ringkasan data berikut dan berikan insight dalam Bahasa Indonesia. Format respons HARUS valid JSON saja, tanpa markdown.
 
 Ringkasan: Total Revenue Rp ${summary.totalRevenue?.toLocaleString("id-ID")}, Total Transaksi ${summary.totalTransactions}, Rata-rata Order Rp ${summary.avgOrderValue?.toLocaleString("id-ID")}, Pelanggan Baru/Unik ${summary.newCustomers}.
 

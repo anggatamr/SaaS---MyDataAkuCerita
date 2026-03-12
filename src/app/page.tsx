@@ -871,7 +871,7 @@ export default function Dashboard() {
   const exportToExcel = () => {
     if (!data) return;
     const ws = XLSX.utils.json_to_sheet([
-      ["DataNarasi - Laporan Bisnis"],
+      ["MyDataAkuCerita - Laporan Bisnis"],
       [""],
       ["KPI Summary"],
       ["Metrik", "Nilai", "Trend"],
@@ -886,7 +886,7 @@ export default function Dashboard() {
 
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Report");
-    XLSX.writeFile(wb, `DataNarasi-Report-${new Date().toISOString().split("T")[0]}.xlsx`);
+    XLSX.writeFile(wb, `MyDataAkuCerita-Report-${new Date().toISOString().split("T")[0]}.xlsx`);
     setToast({ message: "Excel berhasil diunduh!", type: "success" });
   };
 
