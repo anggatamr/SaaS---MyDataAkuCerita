@@ -820,9 +820,51 @@ export default function Dashboard() {
   };
 
   const filterDataByPeriod = (chartData: BusinessData["charts"], selectedPeriod: string) => {
-    if (selectedPeriod === "day") return chartData.slice(-1);
-    if (selectedPeriod === "week") return chartData.slice(-7);
-    if (selectedPeriod === "month") return chartData;
+    if (!chartData || chartData.length === 0) return [];
+
+    // Helper to group by key and sum revenue
+    const aggregate = (data: BusinessData["charts"], keyFn: (date: Date) => string) => {
+      const grouped: Record<string, number> = {};
+      data.forEach(item => {
+        // Handle potentially invalid dates gracefully
+        const d = new Date(item.date);
+        if (isNaN(d.getTime())) return;
+        
+        const key = keyFn(d);
+        grouped[key] = (grouped[key] || 0) + item.revenue;
+      });
+
+      // Convert back to array format required by Recharts
+      return Object.entries(grouped).map(([date, revenue]) => ({ date, revenue }));
+    };
+
+    if (selectedPeriod === "day") {
+      // For daily, just show the last 14 days to keep it readable, 
+      // or the whole array if less than 14 days.
+      return chartData.slice(-14);
+    } 
+    
+    if (selectedPeriod === "week") {
+      // Group by Week (Year-Wxx format or "Minggu X, Bulan")
+      return aggregate(chartData, (d) => {
+        // Simple week number calculation
+        const firstDayOfYear = new Date(d.getFullYear(), 0, 1);
+        const pastDaysOfYear = (d.getTime() - firstDayOfYear.getTime()) / 86400000;
+        const weekNum = Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+        
+        const monthNames = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
+        return `Mg ${weekNum}, ${monthNames[d.getMonth()]}`;
+      });
+    } 
+    
+    if (selectedPeriod === "month") {
+      // Group by Month (e.g. "Jan 2026")
+      return aggregate(chartData, (d) => {
+        const monthNames = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
+        return `${monthNames[d.getMonth()]} ${d.getFullYear()}`;
+      });
+    }
+
     return chartData;
   };
 
