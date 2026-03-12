@@ -176,20 +176,46 @@ export function analyzeData(
   const uniqueKeys = new Set(rows.map((r) => JSON.stringify(r)).slice(0, 500));
   const newCustomers = Math.min(uniqueKeys.size, Math.max(1, Math.floor(totalTransactions / 10)));
 
-  const charts = DAY_LABELS.map((label, i) => ({
-    date: label,
-    revenue: revenueByDay[i] ?? 0,
-  }));
-
-  // If no revenue column found, show placeholder chart with equal distribution
   const hasRealRevenue = revenueCol && totalRevenue > 0;
-  const defaultRevenueByDay = [4000000, 3000000, 5000000, 4500000, 6000000, 8000000, 7000000];
-  const chartData = hasRealRevenue
-    ? charts
-    : DAY_LABELS.map((label, i) => ({
-      date: label,
-      revenue: totalTransactions > 0 ? Math.round((totalRevenue || 1000000) / 7) + i * 50000 : defaultRevenueByDay[i],
-    }));
+  let chartData: { date: string; revenue: number }[] = [];
+
+  if (hasRealRevenue && dateCol) {
+    const dailyRevenues: Record<string, number> = {};
+    for (const row of rows) {
+      const record = row as Record<string, unknown>;
+      const rev = toNumber(record[revenueCol!]);
+      
+      let dateStr = "";
+      const d = record[dateCol!];
+      if (d) {
+        const parsedD = typeof d === "string" ? new Date(d) : d instanceof Date ? d : null;
+        if (parsedD && !Number.isNaN(parsedD.getTime())) {
+          dateStr = parsedD.toISOString().split("T")[0];
+        }
+      }
+      if (dateStr) {
+        dailyRevenues[dateStr] = (dailyRevenues[dateStr] || 0) + rev;
+      }
+    }
+
+    chartData = Object.entries(dailyRevenues)
+      .map(([date, revenue]) => ({ date, revenue }))
+      .sort((a, b) => a.date.localeCompare(b.date));
+  }
+
+  // Fallback to exactly 7 last days
+  if (chartData.length === 0) {
+    const defaultRevenueByDay = [4000000, 3000000, 5000000, 4500000, 6000000, 8000000, 7000000];
+    const baseDate = new Date();
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(baseDate);
+      d.setDate(d.getDate() - i);
+      chartData.push({
+        date: d.toISOString().split("T")[0],
+        revenue: totalTransactions > 0 ? Math.round((totalRevenue || 1000000) / 7) + (6-i) * 50000 : defaultRevenueByDay[6-i]
+      });
+    }
+  }
 
   const insights = buildInsights({
     totalRevenue: hasRealRevenue ? totalRevenue : 84500000,
